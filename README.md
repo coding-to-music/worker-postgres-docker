@@ -13,7 +13,11 @@ https://worker-postgres-docker.vercel.app/api/auth
 
 By Cloudflare Documentation
 
-https://developers.cloudflare.com/workers/tutorials/postgres/
+https://github.com/cloudflare/worker-template-postgres/
+
+https://developers.cloudflare.com/workers/tutorials/query-postgres-from-workers-using-database-connectors/
+
+
 
 ## Environment Values
 
