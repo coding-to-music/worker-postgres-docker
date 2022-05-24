@@ -76,12 +76,12 @@ applications to securely connect, through a encrypted tunnel, without opening an
 > from within `scripts/postgres`, run: 
 
 1. **Create credentials file (first time only)**
-```sh
+```java
 docker run -v ~/.cloudflared:/etc/cloudflared cloudflare/cloudflared:2021.10.5 login
 ```
 
 2. **Start a local dev stack (cloudflared/pgbouncer/postgres)**
-```sh
+```java
 TUNNEL_HOSTNAME=dev.example.com docker-compose up
 ```
 
@@ -116,9 +116,33 @@ To get started:
 1.  Run the following `git` command to clone a basic [Postgres database connector](https://github.com/cloudflare/worker-template-postgres) project.
 2.  After running the `git clone` command, `cd` into the new project.
 
-```sh
+```java
 git clone https://github.com/cloudflare/worker-template-postgres/
 cd worker-template-postgres
+```
+
+## Install Cloudflared and download the pem certificate
+
+```java
+cd to home directory
+
+cd
+
+wget -q https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+sudo dpkg -i cloudflared-linux-amd64.deb 
+
+cloudflared tunnel login
+
+It has an error writing to my home directory
+
+so create the target directory
+
+sudo touch .cloudflared
+
+
+sudo chmod 777 .cloudflared/
+
+cloudflared tunnel login
 ```
 
 ## Cloudflare Tunnel authentication
@@ -126,14 +150,99 @@ cd worker-template-postgres
 To create and manage secure Cloudflare Tunnels, you first need to authenticate `cloudflared` CLI.
 Skip this step if you already have authenticated `cloudflared` locally.
 
-```sh
+```java
 docker run -v ~/.cloudflared:/etc/cloudflared cloudflare/cloudflared:2021.11.0 login
+```
+
+Output
+
+```java
+Please open the following URL and log in with your Cloudflare account:
+
+https://dash.cloudflare.com/argotunnel?callback=https%3A%2F%2Flogin.cloudflareaccess.org etc
+
+Leave cloudflared running to download the cert automatically.
+2022-05-24T06:51:55Z INF Waiting for login...
+2022-05-24T06:52:48Z INF Waiting for login...
+You have successfully logged in.
+If you wish to copy your credentials to a server, they have been saved to:
+~/.cloudflared/cert.pem
+```
+
+Verify
+
+```java
+ls ~/.cloudflared/
+```
+
+```java
+cert.pem
 ```
 
 Running this command will:
 
 - Prompt you to select your Cloudflare account and hostname.
 - Download credentials and allow `cloudflared` to create Tunnels and DNS records.
+
+## actually create and name the tunnel
+
+```java
+cloudflared tunnel create my-tunnel
+```
+
+```java
+2022-05-24T09:03:40Z ERR Configuration file /home/tmc/.cloudflared/config.yml was empty
+Tunnel credentials written to /home/tmc/.cloudflared/b98f6dff-6605-43c4-b83a-2315e4.json. cloudflared chose this file based on where your origin certificate was found. Keep this file secret. To revoke these credentials, delete the tunnel.
+
+Created tunnel my-tunnel with id b98f6dff-6605-43c4-b83a-2315e4
+```
+
+## Confirm that the tunnel has been successfully created by running:
+
+https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/tunnel-guide/#set-up-a-tunnel-remotely-dashboard-setup
+
+```java
+cloudflared tunnel list
+```
+
+Output
+
+```java
+2022-05-24T09:08:37Z ERR Configuration file /home/tmc/.cloudflared/config.yml was empty
+You can obtain more detailed information for each tunnel with `cloudflared tunnel info <name/uuid>`
+ID                                   NAME                 CREATED              CONNECTIONS  
+c51576d0-b652-4499-9ab5-f65fe7c355db all-knowledge-tunnel 2022-05-24T07:21:23Z 2xEWR, 2xORD 
+b98f6dff-6605-43c4-b83a-2315e409920c my-tunnel            2022-05-24T09:03:41Z              
+```
+
+## ​​4. Create a configuration file
+
+Create a configuration file in your .cloudflared directory using any text editor. This file will configure the tunnel to route traffic from a given origin to the hostname of your choice.
+
+Add the following fields to the file:
+
+If you are connecting an application
+
+```java
+url: http://localhost:8000
+tunnel: <Tunnel-UUID>
+credentials-file: /root/.cloudflared/<Tunnel-UUID>.json
+```
+
+If you are connecting a network
+
+```java
+tunnel: <Tunnel-UUID>
+credentials-file: /root/.cloudflared/<Tunnel-UUID>.json
+warp-routing:
+  enabled: true
+```
+
+Confirm that the configuration file has been successfully created by running:
+
+```java
+cat ~/.cloudflared/config.yml
+```
 
 ## Start and prepare Postgres database
 
@@ -153,10 +262,13 @@ You can find a prepared `docker-compose` file that does not require any changes 
 
 Run the following commands to start all services. Replace `postgres-tunnel.example.com` with a hostname on your Cloudflare zone to route traffic through this tunnel.
 
-```sh
+```java
 cd scripts/postgres
 export TUNNEL_HOSTNAME=postgres-tunnel.example.com
-docker compose up
+
+# in my case, use my url
+export TUNNEL_HOSTNAME=all-knowledge.info
+docker-compose up
 
 # Alternative: Run `docker compose up -D` to start docker-compose detached
 ```
@@ -168,7 +280,7 @@ The DNS record will point to the Cloudflare Tunnel, which keeps a secure connect
 
 Once Postgres is up and running, seed the database with a schema and a dataset. For this tutorial, you will use the Pagila schema and dataset. Use `docker exec` to execute a command inside the running Postgres container and import [Pagila](https://github.com/devrimgunduz/pagila) schema and dataset.
 
-```sh
+```java
 curl https://raw.githubusercontent.com/devrimgunduz/pagila/master/pagila-schema.sql | docker exec -i postgres_postgresql_1 psql -U postgres -d postgres
 curl https://raw.githubusercontent.com/devrimgunduz/pagila/master/pagila-data.sql | docker exec -i postgres_postgresql_1 psql -U postgres -d postgres
 ```
@@ -267,7 +379,7 @@ account_id = ""
 
 Publish your function:
 
-```sh
+```java
 wrangler publish
 ✨  Built successfully, built project size is 10 KiB.
 ✨  Successfully published your script to
@@ -278,7 +390,7 @@ wrangler publish
 
 Create and save [a Client ID and a Client Secret](/cloudflare-one/identity/service-auth/service-tokens) to Worker secrets in case your Tunnel is protected by Cloudflare Access.
 
-```sh
+```java
 wrangler secret put CF_CLIENT_ID
 wrangler secret put CF_CLIENT_SECRET
 ```
@@ -287,7 +399,7 @@ wrangler secret put CF_CLIENT_SECRET
 
 Request some of the Pagila tables by adding the `?pagila-table` query parameter with a table name to the URL of the Worker.
 
-```sh
+```java
 curl https://example.workers.dev/?pagila-table=actor
 curl https://example.workers.dev/?pagila-table=address
 curl https://example.workers.dev/?pagila-table=country
@@ -298,7 +410,7 @@ curl https://example.workers.dev/?pagila-table=language
 
 Run the following command to stop and remove the Docker containers and networks:
 
-```sh
+```java
 docker compose down
 
 # Stop and remove containers, networks
