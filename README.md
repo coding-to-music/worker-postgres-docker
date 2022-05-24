@@ -11,9 +11,9 @@ https://worker-postgres-docker.vercel.app
 
 https://worker-postgres-docker.vercel.app/api/auth
 
-By Vercel NextJS Guide
+By Cloudflare Documentation
 
-https://vercel.com/guides/nextjs-prisma-postgres
+https://developers.cloudflare.com/workers/tutorials/postgres/
 
 ## Environment Values
 
