@@ -77,7 +77,7 @@ applications to securely connect, through a encrypted tunnel, without opening an
 
 1. **Create credentials file (first time only)**
 ```java
-docker run -v ~/.cloudflared:/etc/cloudflared cloudflare/cloudflared:2021.10.5 login
+docker run -v ~/.cloudflared:/etc/cloudflared cloudflare/cloudflared login
 ```
 
 2. **Start a local dev stack (cloudflared/pgbouncer/postgres)**
@@ -121,6 +121,11 @@ git clone https://github.com/cloudflare/worker-template-postgres/
 cd worker-template-postgres
 ```
 
+# ​​Set up a tunnel locally (CLI setup)
+Follow this step-by-step guide to get your first tunnel up and running using the CLI.
+
+## ​​1. Download and install cloudflared
+
 ## Install Cloudflared and download the pem certificate
 
 ```java
@@ -142,6 +147,12 @@ sudo touch .cloudflared
 
 sudo chmod 777 .cloudflared/
 
+cloudflared tunnel login
+```
+
+## ​​2. Authenticate cloudflared
+
+```java
 cloudflared tunnel login
 ```
 
@@ -183,6 +194,8 @@ Running this command will:
 
 - Prompt you to select your Cloudflare account and hostname.
 - Download credentials and allow `cloudflared` to create Tunnels and DNS records.
+
+## 3. Create a tunnel and give it a name
 
 ## actually create and name the tunnel
 
@@ -267,7 +280,7 @@ cd scripts/postgres
 export TUNNEL_HOSTNAME=postgres-tunnel.example.com
 
 # in my case, use my url
-export TUNNEL_HOSTNAME=all-knowledge.info
+export TUNNEL_HOSTNAME=dev.all-knowledge.info
 docker-compose up
 
 # Alternative: Run `docker compose up -D` to start docker-compose detached
@@ -275,6 +288,12 @@ docker-compose up
 
 `docker-compose` will spin up and configure all the services for you, including the creation of the Tunnel's DNS record.
 The DNS record will point to the Cloudflare Tunnel, which keeps a secure connection between a local instance of `cloudflared` and the Cloudflare network.
+
+May need to add this to config.yml
+
+```java
+origincert: /home/tmc/.cloudflared/cert.pem
+```
 
 ### Import example dataset
 

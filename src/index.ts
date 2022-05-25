@@ -17,7 +17,7 @@ export default {
         database: 'postgres',
         // hostname is the full URL to your pre-created Cloudflare Tunnel, see documentation here:
         // https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/create-tunnel
-        hostname: 'https://dev.example.com',
+        hostname: 'https://dev.all-knowledge.info',
         password: 'password', // use a secret to store passwords
         port: '5432',
       })
