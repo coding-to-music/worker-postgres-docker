@@ -260,7 +260,7 @@ cat ~/.cloudflared/config.yml
 
 Warning
 
-Cloudflare Tunnel will be accessible from the Internet once you run the following `docker compose` command. Cloudflare recommends that you secure your `TUNNEL_HOSTNAME` behind [Cloudflare Access](/cloudflare-one/applications/configure-apps/self-hosted-apps) before you continue.
+Cloudflare Tunnel will be accessible from the Internet once you run the following `docker compose` command. Cloudflare recommends that you secure your `TUNNEL_HOSTNAME` behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/applications/configure-apps/self-hosted-apps) before you continue.
 
 
 You can find a prepared `docker-compose` file that does not require any changes in `scripts/postgres` with the following services:
