@@ -85,14 +85,6 @@ docker run -v ~/.cloudflared:/etc/cloudflared cloudflare/cloudflared login
 TUNNEL_HOSTNAME=dev.example.com docker-compose up
 ```
 
----
-updated: 2021-11-15
-difficulty: Beginner
-content_type: 📝 Tutorial
-pcx-content-type: tutorial
-title: Query Postgres from Workers using a database connector
----
-
 # Query Postgres from Workers using a database connector
 
 <TutorialsBeforeYouStart />
@@ -309,10 +301,8 @@ The above commands will download the SQL schema and dataset files from Pagila's 
 In `src/index.ts`, replace `https://dev.example.com` with your Cloudflare Tunnel hostname, ensuring that it is prefixed with the `https://` protocol:
 
 ```js
----
-filename: src/index.ts
-highlight: [4]
----
+// src/index.ts
+
 const client = new Client({
   user: 'postgres',
   database: 'postgres',
@@ -382,10 +372,8 @@ note
 
 
 ```toml
----
-filename: wrangler.toml
-highlight: [3]
----
+// wrangler.toml
+
 name = "worker-postgres-template"
 type = "javascript"
 account_id = ""
